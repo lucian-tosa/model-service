@@ -57,7 +57,7 @@ jobs:
           echo "value=$RESOLVED_VALUE" >> "$GITHUB_OUTPUT"
 
       - name: Add version to service
-        id: get_version
+        id: set_service_version
         run: |
           TAG=${{ steps.version.outputs.value }}
           echo "VERSION=$TAG" >> $GITHUB_ENV
