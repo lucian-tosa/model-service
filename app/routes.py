@@ -1,7 +1,7 @@
 from flask import request, jsonify, Blueprint
 from sentiment_analysis_preprocessing.preprocess import *
-from model_loader import model
-from version import __version__
+from app.model_loader import model
+from app.version import __version__
 
 
 bp = Blueprint('routes', __name__)
