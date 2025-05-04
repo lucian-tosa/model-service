@@ -23,4 +23,4 @@ COPY app/ /root/app
 COPY model/preprocessor.joblib /root/model/preprocessor.joblib
 
 ENTRYPOINT ["python"]
-CMD ["app/serve_model.py"]
+CMD ["app/main.py"]
