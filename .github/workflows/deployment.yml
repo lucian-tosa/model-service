@@ -58,10 +58,7 @@ jobs:
 
       - name: Add version to service
         id: set_service_version
-        run: |
-          TAG=${{ steps.version.outputs.value }}
-          echo "VERSION=$TAG" >> $GITHUB_ENV
-          echo "__version__ = \"$VERSION\"" > app/version.py
+        run: echo "__version__ = \"${{ steps.version.outputs.value }}\"" > app/version.py
 
       - name: Create stable git tag
         id: create_stable_tag
