@@ -1,9 +1,9 @@
-name: Deployment
+name: Manual bump
 
 on:
-  release:
-    types:
-      - published
+  push:
+    tags:
+      - '*'
 
 permissions:
   contents: write
@@ -13,6 +13,16 @@ env:
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
 
 jobs:
+  create-release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          prerelease: false
+
   build-and-deploy:
     runs-on: ubuntu-24.04
 
@@ -36,7 +46,6 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=sha,enable=false
-            type=raw,value=${{ github.event.release.prerelease != true && 'latest' || 'latest-rc' }}
             type=raw,value=${{ github.ref_name }}
 
       - name: Log in to GHCR
