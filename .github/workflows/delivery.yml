@@ -19,7 +19,7 @@ jobs:
       - name: Get latest tag
         id: get_tag
         run: |
-          latest_tag=$(git tag --list --sort=-v:refname | wsl head -n1)
+          latest_tag=$(git tag --list --sort=-v:refname | head -n1)
           echo "latest=$latest_tag" >> $GITHUB_OUTPUT
 
       - name: Generate pre-release tag
