@@ -30,7 +30,7 @@ def predict():
     input_data = request.get_json()
     review = input_data.get("review")
 
-    processed_review = prepare(review, model_path="model/preprocessor.joblib")
+    processed_review = prepare(review)
 
     prediction = model.predict(processed_review.toarray())[0]
     res = {

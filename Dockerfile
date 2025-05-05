@@ -7,19 +7,27 @@ RUN apt update \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . .
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir .
+COPY app/ /root/app/
+COPY setup.py /root
+COPY data/ /root/data/
 
+RUN pip install --upgrade pip \
+    && pip install .
+
+RUN python app/preprocessor_loader.py
 
 FROM python:3.11.9-slim
 
 WORKDIR /root
 
-COPY --from=builder /usr/local /usr/local
+ARG VERSION
 
-# TODO get preprocessor joblib from github
-COPY model/preprocessor.joblib /root/model/preprocessor.joblib
+LABEL version=$VERSION
+
+ENV MODEL_SERVICE_VERSION=$VERSION
+
+COPY --from=builder /usr/local /usr/local
+COPY --from=builder /root/output/preprocessor.joblib /root/output/preprocessor.joblib
 
 ENTRYPOINT ["python"]
 CMD ["-m", "app.main"]
