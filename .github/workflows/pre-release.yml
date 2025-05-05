@@ -37,9 +37,6 @@ jobs:
           
           IFS='.' read -r major minor patch <<< "$(echo "$base_version" | sed 's/^v//')" 
           
-          echo "tags = $tags"
-          echo "rc_tags = $rc_tags"
-          
           if [[ tags -gt $rc_tags ]]; then
             echo "There are more tags than rc tags for the same version, it means that this version was already released."
             new_tag="v$major.$minor.$((patch+1))-rc.0"
