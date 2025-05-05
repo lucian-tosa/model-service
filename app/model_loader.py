@@ -10,7 +10,8 @@ def init():
     """
     global model
     print("Loading model...")
-    model_path = ".cache/model-v0.0.0.joblib"
+    model_version = os.getenv("MODEL_VERSION")
+    model_path = f".cache/sentiment-pipeline-{model_version}.joblib"
     if not os.path.exists(model_path):
         # If the model does not exist, download it
         print("Model not found in cache. Downloading...")
