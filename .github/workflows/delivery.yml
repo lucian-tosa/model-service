@@ -38,7 +38,7 @@ jobs:
           
           echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
 
-#      - name: Create pre-release tag
-#        run: |
-#          git tag "${{ steps.prerelease.outputs.new_tag }}"
-#          git push origin "${{ steps.prerelease.outputs.new_tag }}"
+      - name: Create pre-release tag
+        run: |
+          git tag "${{ steps.prerelease.outputs.new_tag }}"
+          git push origin "${{ steps.prerelease.outputs.new_tag }}"
