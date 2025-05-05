@@ -37,6 +37,9 @@ jobs:
           
           IFS='.' read -r major minor patch <<< "$(echo "$base_version" | sed 's/^v//')" 
           
+          echo "stable_tag = $stable_tag"
+          echo "rc_tags = $rc_tags"
+          
           if [[ $stable_tag -ne 0 ]]; then
             new_tag="v$major.$minor.$((patch+1))-rc.0"
           else
