@@ -25,26 +25,24 @@ jobs:
           latest_tag=$(git tag --list --sort=-v:refname | head -n1)
           echo "latest=$latest_tag" >> $GITHUB_OUTPUT
 
-      - name: Generate stable tag
+      - name: Generate tags
         id: prerelease
         run: |
           base_version=$(echo "${{ steps.get_tag.outputs.latest }}" | sed 's/-.*//')
           prerelease_base="${base_version}-rc"
           existing=$(git tag --list | grep "${prerelease_base}.*" | wc -l)
+          IFS='.' read -r major minor patch <<< "$(echo "$base_version" | sed 's/^v//')" 
           
           if [[ $existing -eq 0 ]]; then
-            IFS='.' read -r major minor patch <<< "$(echo "$base_version" | sed 's/^v//')" 
             new_tag="v$major.$minor.$((patch+1))"
+            pre_release_tag="v$major.$minor.$((patch+2))-rc.0"
           else
             new_tag="${base_version}"
+            pre_release_tag="v$major.$minor.$((patch+1))-rc.0"
           fi
           
           echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
-
-      - name: Create stable tag
-        run: |
-          git tag "${{ steps.prerelease.outputs.new_tag }}"
-          git push origin "${{ steps.prerelease.outputs.new_tag }}"
+          echo "pre_release_tag=$pre_release_tag" >> $GITHUB_OUTPUT
 
        # Enables the runner to emulate different architectures
       - name: Set up QEMU
@@ -82,9 +80,24 @@ jobs:
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max,image-manifest=true
 
+      - name: Create stable tag
+        run: |
+          git tag "${{ steps.prerelease.outputs.new_tag }}"
+          git push origin "${{ steps.prerelease.outputs.new_tag }}"
+
       - name: Create release
-        id: create_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.prerelease.outputs.new_tag }}
           prerelease: false
+
+      - name: Create rc tag
+        run: |
+          git tag "${{ steps.prerelease.outputs.pre_release_tag }}"
+          git push origin "${{ steps.prerelease.outputs.pre_release_tag }}"
+
+      - name: Create pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.prerelease.outputs.pre_release_tag }}
+          prerelease: true
