@@ -16,24 +16,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get latest tag information
-        id: get_tag_info
-        uses: mathieudutour/github-tag-action@v6.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pre_release_branches: main
-          default_prerelease_bump: false
-          default_bump: false
-          append_to_pre_release_tag: pre
-          tag_prefix: v
-          dry_run: 'true'
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          latest_tag=$(git describe --tags --match "v[0-9]*-pre-[0-9]*" --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest=$latest_tag" >> $GITHUB_OUTPUT
 
-#      - name: Create new pre-release tag
-#        id: tag_version
-#        uses: mathieudutour/github-tag-action@v6.2
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          pre_release_branches: main
-#          default_prerelease_bump: ${{ steps.determine_bump.outputs.bump_type }}
-#          append_to_pre_release_tag: pre
-#          tag_prefix: v
+      - name: Generate pre-release tag
+        id: prerelease
+        run: |
+          base_version=$(echo "${{ steps.get_tag.outputs.latest }}" | sed 's/-.*//')
+          prerelease_base="${base_version}-beta"
+          existing=$(git tag --list "${prerelease_base}.*" | wc -l)
+          new_tag="${prerelease_base}.$((existing + 1))"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+
+#      - name: Create pre-release tag
+#        run: |
+#          git tag "${{ steps.prerelease.outputs.new_tag }}"
+#          git push origin "${{ steps.prerelease.outputs.new_tag }}"
