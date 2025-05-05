@@ -1,18 +1,17 @@
-name: Pre-release
-
-#env:
-#  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
+name: Patch release
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
-#  packages: write
+#  packages:  write
+#
+#env:
+#  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
 
 jobs:
-  build-and-deploy-rc:
+  build-and-deploy:
     runs-on: ubuntu-24.04
 
     steps:
@@ -26,7 +25,7 @@ jobs:
           latest_tag=$(git tag --list --sort=-v:refname | head -n1)
           echo "latest=$latest_tag" >> $GITHUB_OUTPUT
 
-      - name: Generate pre-release tag
+      - name: Generate stable tag
         id: prerelease
         run: |
           base_version=$(echo "${{ steps.get_tag.outputs.latest }}" | sed 's/-.*//')
@@ -35,19 +34,19 @@ jobs:
           
           if [[ $existing -eq 0 ]]; then
             IFS='.' read -r major minor patch <<< "$(echo "$base_version" | sed 's/^v//')" 
-            new_tag="v$major.$minor.$((patch+1))-rc.0"
+            new_tag="v$major.$minor.$((patch+1))"
           else
-            new_tag="${prerelease_base}.$((existing))"
+            new_tag="${base_version}"
           fi
           
           echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
 
-      - name: Create pre-release tag
+      - name: Create stable tag
         run: |
           git tag "${{ steps.prerelease.outputs.new_tag }}"
           git push origin "${{ steps.prerelease.outputs.new_tag }}"
 
-#      # Enables the runner to emulate different architectures
+      # Enables the runner to emulate different architectures
 #      - name: Set up QEMU
 #        uses: docker/setup-qemu-action@v3
 #
@@ -64,7 +63,7 @@ jobs:
 #            type=sha,enable=false
 #            type=raw,value=latest
 #            type=raw,value=${{ steps.prerelease.outputs.new_tag }}
-#
+
 #      - name: Log in to GHCR
 #        uses: docker/login-action@v3
 #        with:
@@ -83,9 +82,9 @@ jobs:
 #          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
 #          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max,image-manifest=true
 
-      - name: Create pre-release
-        id: create_prerelease
+      - name: Create release
+        id: create_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.prerelease.outputs.new_tag }}
-          prerelease: true
+          prerelease: false
