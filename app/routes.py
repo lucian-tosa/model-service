@@ -9,7 +9,7 @@ bp = Blueprint('routes', __name__)
 @bp.route("/v1/predict", methods=["POST"])
 def predict():
     """
-        Submit some JSON data to be processed.
+        Submit a review message to be predicted as positive or negative.
         ---
         consumes:
           - application/json
@@ -22,7 +22,7 @@ def predict():
               properties:
                 review:
                   type: string
-            description: The text to be analyzed.
+            description: The review to be analyzed
         responses:
           200:
             description: Prediction result.
