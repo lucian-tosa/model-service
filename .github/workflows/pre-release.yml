@@ -62,7 +62,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=sha,enable=false
-            type=raw,value=latest
+            type=raw,value=latest-rc
             type=raw,value=${{ steps.prerelease.outputs.new_tag }}
 
       - name: Log in to GHCR
