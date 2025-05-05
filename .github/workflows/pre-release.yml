@@ -1,4 +1,4 @@
-name: Delivery
+name: Pre-release
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
@@ -12,7 +12,7 @@ permissions:
   packages: write
 
 jobs:
-  update-tag:
+  build-and-deploy-rc:
     runs-on: ubuntu-24.04
 
     steps:
@@ -30,14 +30,14 @@ jobs:
         id: prerelease
         run: |
           base_version=$(echo "${{ steps.get_tag.outputs.latest }}" | sed 's/-.*//')
-          prerelease_base="${base_version}-pre"
+          prerelease_base="${base_version}-rc"
           existing=$(git tag --list | grep "${prerelease_base}.*" | wc -l)
           
           if [[ $existing -eq 0 ]]; then
             IFS='.' read -r major minor patch <<< "$(echo "$base_version" | sed 's/^v//')" 
-            new_tag="v$major.$minor.$((patch+1))-pre-0"
+            new_tag="v$major.$minor.$((patch+1))-rc.0"
           else
-            new_tag="${prerelease_base}-$((existing))"
+            new_tag="${prerelease_base}.$((existing))"
           fi
           
           echo "new_tag=$new_tag" >> $GITHUB_OUTPUT

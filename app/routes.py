@@ -40,7 +40,7 @@ def predict():
 
     return jsonify(res)
 
-@bp.route("/v1/health", methods=["GET"])
+@bp.route("/health", methods=["GET"])
 def health():
     """
         Health check endpoint.
