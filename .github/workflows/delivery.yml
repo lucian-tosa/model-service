@@ -26,9 +26,9 @@ jobs:
         id: prerelease
         run: |
           base_version=$(echo "${{ steps.get_tag.outputs.latest }}" | sed 's/-.*//')
-          prerelease_base="${base_version}-beta"
-          existing=$(git tag --list "${prerelease_base}.*" | wc -l)
-          new_tag="${prerelease_base}.$((existing + 1))"
+          prerelease_base="${base_version}-pre"
+          existing=$(git tag --list | grep "${prerelease_base}.*" | wc -l)
+          new_tag="${prerelease_base}.$((existing))"
           echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
 
 #      - name: Create pre-release tag
