@@ -33,7 +33,7 @@ jobs:
           prerelease_base="${base_version}-rc"
           
           rc_tags=$(git tag --list | grep "${prerelease_base}.*" | wc -l)
-          stable_tag=$(git tag --list | grep "^${base_version}[^-]" | wc -l)
+          stable_tag=$(git tag --list | grep "${base_version}[^-]" | wc -l)
           
           IFS='.' read -r major minor patch <<< "$(echo "$base_version" | sed 's/^v//')" 
           
