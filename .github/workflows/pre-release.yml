@@ -33,14 +33,15 @@ jobs:
           prerelease_base="${base_version}-rc"
           
           rc_tags=$(git tag --list | grep "${prerelease_base}.*" | wc -l)
-          stable_tag=$(git tag --list | grep "${base_version}[^-]" | wc -l)
+          tags=$(git tag --list | grep "${base_version}" | wc -l)
           
           IFS='.' read -r major minor patch <<< "$(echo "$base_version" | sed 's/^v//')" 
           
-          echo "stable_tag = $stable_tag"
+          echo "tags = $tags"
           echo "rc_tags = $rc_tags"
           
-          if [[ $stable_tag -ne 0 ]]; then
+          if [[ tags -gt $rc_tags ]]; then
+            echo "There are more tags than rc tags for the same version, it means that this version was already released."
             new_tag="v$major.$minor.$((patch+1))-rc.0"
           else
             new_tag="${prerelease_base}.$((rc_tags))"
